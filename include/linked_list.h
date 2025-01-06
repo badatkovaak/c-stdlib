@@ -16,7 +16,7 @@ typedef struct {
     void *data;
 } LinkedList;
 
-void push(LinkedList **list, void *value) {
+void list_push(LinkedList **list, void *value) {
     if (!(*list)) {
         *list = malloc(sizeof(LinkedList));
         **list = (LinkedList){0, value};
@@ -47,7 +47,7 @@ void *get(LinkedList *list, unsigned index) {
     return list->data;
 }
 
-void *pop(LinkedList *list) {
+void *list_pop(LinkedList *list) {
     LinkedList *current = list;
     LinkedList *next = list->next;
 
@@ -63,7 +63,7 @@ void *pop(LinkedList *list) {
     return res;
 }
 
-void *pop_front(LinkedList **list_ref) {
+void *list_pop_front(LinkedList **list_ref) {
     void *result = get(*list_ref, 0);
     LinkedList *head = (*list_ref)->next;
     LIST_FREE(*list_ref);
@@ -81,6 +81,25 @@ int list_length(LinkedList *list) {
     }
 
     return len;
+}
+
+void list_free(LinkedList *list) {
+    if (!list)
+        return;
+
+    list_free(list->next);
+    LIST_FREE(list);
+}
+
+void list_free_with_data(LinkedList *list) {
+    if (!list)
+        return;
+
+    if (list->data)
+        LIST_FREE(list->data);
+
+    list_free_with_data(list->next);
+    LIST_FREE(list);
 }
 
 #endif // !LINKED_LIST_H
